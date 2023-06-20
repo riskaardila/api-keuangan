@@ -18,8 +18,8 @@ use App\Http\Controllers\UangKeluarController;
 */
 
 Route::middleware('auth')->group(function() {
-    Route::get('/dasboard', function () {
-        return view('dasboard.index',[
+    Route::get('/dashboard', function () {
+        return view('pages.dashboard',[
             "title" => "Dasboard"
         ]);
     });

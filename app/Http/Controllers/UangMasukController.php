@@ -6,6 +6,7 @@ use App\Models\UangMasuk;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class UangMasukController extends Controller
 {
@@ -14,13 +15,20 @@ class UangMasukController extends Controller
      */
     public function index()
     {
+        // if (request()->ajax()) {
+        //     $query = UangMasuk::all();
+
+        //     return datatables()->of($query)
+        //         ->addIndexColumn()
+        //         ->rawColumns([])
+        //         ->make(true);
+        // }
         $data = UangMasuk::all();
         return view(
-            'show.uang-masuk',
+            'pages.uang-masuk',
             [
-                "title" => "Uang Masuk",
-                "data" => $data
-            ]
+                'data' => $data
+            ] 
         );
     }
 
@@ -55,11 +63,13 @@ class UangMasukController extends Controller
     public function show($id)
     {
         $data = UangMasuk::findOrFail($id);
-        return view('detail.uang-masuk',
-    [
-        "title" => "Detail",
-        "data" => $data
-    ]);
+        return view(
+            'detail.uang-masuk',
+            [
+                "title" => "Detail",
+                "data" => $data
+            ]
+        );
     }
 
     /**

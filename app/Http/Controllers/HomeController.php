@@ -23,8 +23,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('dasboard.index', [
-            "title" => "Dasboard"
-        ]);
+        return view('pages.dashboard');
     }
 }

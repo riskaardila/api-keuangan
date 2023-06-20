@@ -11,20 +11,22 @@
 
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="tables.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/main-style.css">
     <link href="css/dasboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 </head>
 
 <body>
     @include('dasboard.layouts.header')
+    @include('dasboard.layouts.sidebar')
     <div class="container-fluid">
         <div class="row">
-            @include('dasboard.layouts.sidebar')
-
+            
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                @yield('container')
+                {{-- @yield('container') --}}
 
                 <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
             </main>
