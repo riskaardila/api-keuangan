@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class UangMasukController extends Controller
 {
@@ -15,21 +16,30 @@ class UangMasukController extends Controller
      */
     public function index()
     {
-        // if (request()->ajax()) {
-        //     $query = UangMasuk::all();
+        if (request()->ajax()) {
+            $query = UangMasuk::query();
 
-        //     return datatables()->of($query)
-        //         ->addIndexColumn()
-        //         ->rawColumns([])
-        //         ->make(true);
-        // }
-        $data = UangMasuk::all();
-        return view(
-            'pages.uang-masuk',
-            [
-                'data' => $data
-            ] 
-        );
+            return datatables()->of($query)
+                ->addIndexColumn()
+                ->editColumn('action', function ($item) {
+                    return '
+                    <div class="d-flex">
+                        <a href="' . route('uangmasuk.show', $item->id) . '" class="btn btn-info btn-sm mb-3 mx-1">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="' . route('uangmasuk.edit', $item->id) . '" class="btn btn-warning btn-sm mb-3 mx-1">
+                            <i class="fa fa-pencil-alt"></i>
+                        </a>
+                        <button class="btn btn-danger btn-sm mb-3 mx-1" onclick="btnDeleteUangMasuk(' . $item->id . ')">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                    ';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+        return view('pages.uang-masuk.index');
     }
 
     /**
@@ -37,12 +47,7 @@ class UangMasukController extends Controller
      */
     public function insertUangMasuk()
     {
-        return view(
-            'tambah.tambah-uang-masuk',
-            [
-                "title" => "Tambah Uang Masuk"
-            ]
-        );
+        //
     }
 
     public function store(Request $request)
@@ -63,13 +68,27 @@ class UangMasukController extends Controller
     public function show($id)
     {
         $data = UangMasuk::findOrFail($id);
-        return view(
-            'detail.uang-masuk',
-            [
-                "title" => "Detail",
-                "data" => $data
-            ]
-        );
+        if (request()->ajax()) {
+            $query = UangMasuk::query();
+
+            return datatables()->of($query)
+                ->addIndexColumn()
+                ->editColumn('action', function ($item) {
+                    return '
+                    <div class="d-flex">
+                        <button class="btn btn-warning btn-sm mb-3 mx-1" onClick="btnUpdateUangMasuk(' . $item->id . ')">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm mb-3 mx-1" onclick="btnDeleteUangMasuk(' . $item->id . ')">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                    ';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+        return view('pages.uang-masuk.show', compact('data'));
     }
 
     /**
@@ -79,11 +98,8 @@ class UangMasukController extends Controller
     {
         $data = UangMasuk::findOrFail($id);
         return view(
-            'edit.main-masuk',
-            [
-                "title" => "Edit Uang Masuk",
-                "data" => $data
-            ]
+            'pages.uang-masuk.edit',
+            compact('data')
         );
     }
 
@@ -106,7 +122,14 @@ class UangMasukController extends Controller
      */
     public function destroy(Request $request)
     {
-        UangMasuk::destroy($request->id);
-        return redirect('uang-masuk')->with('Success', 'Uang Masuk been Deleted!');
+        $item = UangMasuk::findOrFail($request->id);
+        $item->delete();
+        if ($item) {
+            Alert::success('Berhasil', 'Data berhasil dihapus');
+            return redirect()->route('uangmasuk.index');
+        } else {
+            Alert::error('Gagal', 'Data gagal dihapus');
+            return redirect()->route('uangmasuk.index');
+        }
     }
 }

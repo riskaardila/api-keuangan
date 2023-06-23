@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\UangKeluar;
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\UpdateUangKeluarRequest;
-use App\Models\UangMasuk;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class UangKeluarController extends Controller
 {
@@ -17,11 +15,30 @@ class UangKeluarController extends Controller
      */
     public function index()
     {
-        $data = UangKeluar::all();
-        return view('show.uang-keluar', [
-            "title" => "Uang Keluar",
-            "data" => $data
-        ]);
+        if (request()->ajax()) {
+            $query = UangKeluar::query();
+
+            return datatables()->of($query)
+                ->addIndexColumn()
+                ->editColumn('action', function ($item) {
+                    return '
+                    <div class="d-flex">
+                        <a href="' . route('uangkeluar.show', $item->id) . '" class="btn btn-info btn-sm mb-3 mx-1">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="' . route('uangkeluar.edit', $item->id) . '" class="btn btn-warning btn-sm mb-3 mx-1">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <button class="btn btn-danger btn-sm mb-3 mx-1" onclick="btnDeleteUangKeluar(' . $item->id . ')">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                    ';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+        return view('pages.uang-keluar.index');
     }
 
     /**
@@ -29,12 +46,7 @@ class UangKeluarController extends Controller
      */
     public function insertUangKeluar()
     {
-        return view(
-            'tambah.tambah-uang-keluar',
-            [
-                "title" => "Tambah Uang Keluar"
-            ]
-        );
+        //
     }
 
     /**
@@ -50,7 +62,7 @@ class UangKeluarController extends Controller
             'metode_pembayaran' => $request->metode_pembayaran,
             'tanggal_pembelian' => $request->tanggal_pembelian,
         ]);
-        return redirect()->route('uang-keluar');
+        return redirect()->route('uangkeluar.index');
     }
 
     /**
@@ -59,12 +71,27 @@ class UangKeluarController extends Controller
     public function show($id)
     {
         $data = UangKeluar::findOrFail($id);
+        if (request()->ajax()) {
+            $query = UangKeluar::query();
 
-        return view('detail.uang-keluar', 
-        [
-            "title" => "Detail",
-            "data" => $data
-        ]);
+            return datatables()->of($query)
+                ->addIndexColumn()
+                ->editColumn('action', function ($item) {
+                    return '
+                    <div class="d-flex">
+                        <button class="btn btn-warning btn-sm mb-3 mx-1" onClick="btnUpdateUangKeluar(' . $item->id . ')">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm mb-3 mx-1" onclick="btnDeleteUangKeluar(' . $item->id . ')">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                    ';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+        return view('pages.uang-keluar.show', compact('data'));
     }
 
     /**
@@ -73,13 +100,7 @@ class UangKeluarController extends Controller
     public function edit($id)
     {
         $data = UangKeluar::findOrFail($id);
-        return view(
-            'edit.main-keluar',
-            [
-                "title" => "Edit Uang Keluar",
-                "data" => $data
-            ]
-        );
+        return view('pages.uang-keluar.edit', compact('data'));
     }
 
     /**
@@ -89,11 +110,11 @@ class UangKeluarController extends Controller
     {
         UangKeluar::find($id)->update([
             'nama_barang' => $request->nama_barang,
-            'metode_pembayaran' => $request->metode_pembayaran,
             'harga' => $request->harga,
-            'tanggal_pembelian' => $request->tanggal_pembelian
+            'tanggal_pembelian' => $request->tanggal_pembelian,
+            'metode_pembayaran' => $request->metode_pembayaran
         ]);
-        return redirect()->route('uang-keluar');
+        return redirect()->route('uangkeluar.index');
     }
 
     /**
@@ -101,7 +122,14 @@ class UangKeluarController extends Controller
      */
     public function destroy(Request $request)
     {
-        UangKeluar::destroy($request->id);
-        return redirect('uang-keluar')->with('Success', 'Uang Keluar been Deleted!');
+        $item = UangKeluar::findOrFail($request->id);
+        $item->delete();
+        if ($item) {
+            Alert::success('Berhasil', 'Data berhasil dihapus');
+            return redirect()->route('uangkeluar.index');
+        } else {
+            Alert::error('Gagal', 'Data gagal dihapus');
+            return redirect()->route('uangkeluar.index');
+        }
     }
 }

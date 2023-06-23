@@ -17,13 +17,18 @@
             </li>
             
             <li class="{{ (request()->is('uang-masuk') ? 'active' : '') }}">
-                <a href="/uangmasuk" class="nav-link"><i class="fas fa-medal"></i>
+                <a href="/uangmasuk" class="nav-link"><i class="fas fa-book"></i>
                     <span>Uang Masuk</span></a>
             </li>
 
             <li class="{{ (request()->is('uang-keluar') ? 'active' : '') }}">
-                <a href="/uang-keluar" class="nav-link"><i class="fas fa-user-check"></i>
+                <a href="/uangkeluar" class="nav-link"><i class="fas fa-money-check-alt"></i>
                     <span>Uang Keluar</span></a>
+            </li>
+
+            <li class="{{ (request()->is('users') ? 'active' : '') }}">
+                <a href="/users" class="nav-link"><i class="fas fa-user"></i>
+                    <span>User</span></a>
             </li>
         </ul>
 

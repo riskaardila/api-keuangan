@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UangMasukController;
 use App\Http\Controllers\UangKeluarController;
-
+use App\Http\Controllers\UsersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,11 +19,7 @@ use App\Http\Controllers\UangKeluarController;
 */
 
 Route::middleware('auth')->group(function() {
-    Route::get('/dashboard', function () {
-        return view('pages.dashboard',[
-            "title" => "Dasboard"
-        ]);
-    });
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 });
 
 Route::get('/', function() {
@@ -33,23 +30,16 @@ Route::get('/', function() {
 
 // Untuk Uang Masuk
 Route::get('/uang-masuk', [UangMasukController::class, 'index'])->name('uang-masuk')->middleware('auth');
-Route::get('/getUangMasuk', [UangMasukController::class, 'insertUangMasuk']);
-Route::post('/insertUangMasuk', [UangMasukController::class, 'store'])->name('store.uangmasuk');
-
 Route::resource('uangmasuk', UangMasukController::class)->middleware('auth');
-Route::delete('uangmasuks/{id}', [UangMasukController::class, 'destroy'])->name('uangmasuks.destroy')->middleware('auth');
-Route::get('uangmasuk/details/{id}',[UangMasukController::class, 'show'])->name('uangmasukdetail.show')->middleware('auth');
+Route::post('/hapus', [UangMasukController::class, 'destroy'])->middleware('auth');
 
 
 // untuk uang keluar
-Route::get('/uang-keluar', [UangKeluarController::class, 'index'])->name('uang-keluar')->middleware('auth');
-Route::get('/postUangKeluar', [UangKeluarController::class, 'insertUangKeluar']);
-Route::post('/insertUangKeluar', [UangKeluarController::class, 'store'])->name('store.uangkeluar');
+Route::resource('uangkeluar', UangKeluarController::class)->middleware('auth');
+Route::post('/delete', [UangKeluarController::class, 'destroy'])->middleware('auth');
 
-Route::get('uangkeluar/details/{id}', [UangKeluarController::class, 'show'])->name('uangkeluar.show')->middleware('auth');
-Route::get('/edit/{id}', [UangKeluarController::class, 'edit'])->name('uangkeluar.edit')->middleware('auth');
-Route::put('/edit/{id}', [UangKeluarController::class, 'update'])->name('update.uangkeluar');
-Route::delete('delete/{id}', [UangKeluarController::class, 'destroy'])->name('uangkeluar.hapus')->middleware('auth');
+// USER
+Route::resource('users', UsersController::class)->middleware('auth');
 
 // LOGIN
 Auth::routes();
