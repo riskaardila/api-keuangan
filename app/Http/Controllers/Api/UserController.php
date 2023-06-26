@@ -13,22 +13,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    use PasswordValidationRules;
-
-    /**
-     * @param Request $request
-     * @return mixed
-     */
-    public function fetch(Request $request)
-    {
-        return ResponseFormatter::success($request->user(), 'Data profile user berhasil diambil');
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
     public function login(Request $request)
     {
         try {
@@ -63,18 +47,13 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
     public function register(Request $request)
     {
         try {
             $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'password' => $this->passwordRules(),
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|confirmed',
             ]);
 
             User::create([
@@ -84,7 +63,6 @@ class UserController extends Controller
             ]);
 
             $user = User::where('email', $request->email)->first();
-
             $tokenResult = $user->createToken('authToken')->plainTextToken;
 
             return ResponseFormatter::success([
