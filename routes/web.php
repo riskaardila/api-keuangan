@@ -18,30 +18,28 @@ use App\Http\Controllers\UsersController;
 |
 */
 
-Route::middleware('auth')->group(function() {
-    Route::get('/dashboard', [DashboardController::class, 'index']);
-});
-
-Route::get('/', function() {
-    return view('home' , [
+Route::get('/', function () {
+    return view('home', [
         "title" => "home"
     ]);
 });
 
-// Untuk Uang Masuk
-Route::get('/uang-masuk', [UangMasukController::class, 'index'])->name('uang-masuk')->middleware('auth');
-Route::resource('uangmasuk', UangMasukController::class)->middleware('auth');
-Route::post('/hapus', [UangMasukController::class, 'destroy'])->middleware('auth');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    // Untuk Uang Masuk
+    Route::get('/uang-masuk', [UangMasukController::class, 'index'])->name('uang-masuk');
+    Route::resource('uangmasuk', UangMasukController::class)->middleware('auth');
+    Route::post('/hapus', [UangMasukController::class, 'destroy'])->middleware('auth');
 
 
-// untuk uang keluar
-Route::resource('uangkeluar', UangKeluarController::class)->middleware('auth');
-Route::post('/delete', [UangKeluarController::class, 'destroy'])->middleware('auth');
+    // untuk uang keluar
+    Route::resource('uangkeluar', UangKeluarController::class);
+    Route::post('/delete', [UangKeluarController::class, 'destroy']);
 
-// USER
-Route::resource('users', UsersController::class)->middleware('auth');
+    // USER
+    Route::resource('users', UsersController::class);
+});
 
 // LOGIN
 Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
